@@ -1,9 +1,11 @@
+require 'dry/monads/either'
 require 'dry/validation/constants'
 
 module Dry
   module Validation
     class Result
       include Dry::Equalizer(:output, :messages)
+      include Dry::Monads::Either::Mixin
       include Enumerable
 
       attr_reader :output
@@ -50,6 +52,14 @@ module Dry
 
       def to_ast
         [:set, error_ast]
+      end
+
+      def to_either(options = EMPTY_HASH)
+        if success?
+          Right(output)
+        else
+          Left(messages(options))
+        end
       end
 
       private
