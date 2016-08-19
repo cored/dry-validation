@@ -15,7 +15,7 @@ module Dry
         name, other = node
 
         if name && opts[:path]
-          visit(other, opts.merge(path: [opts[:path], *name]))
+          visit(other, opts.merge(path: [*opts[:path], *name]))
         elsif name
           visit(other, opts.merge(rule: name))
         else

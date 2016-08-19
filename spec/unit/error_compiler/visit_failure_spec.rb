@@ -47,4 +47,25 @@ RSpec.describe Dry::Validation::ErrorCompiler, '#visit_failure' do
       expect(result[1]).to eql('must be an integer')
     end
   end
+
+  context 'with a named set-rule failure and :key? predicate' do
+    let(:node) do
+      [nil, [:set, [:user, [
+        [:failure, [:age, [:predicate, [:key?, [[:name, :age], [:input, {}]]]]]],
+        [:failure, [:email, [:predicate, [:key?, [[:name, :email], [:input, {}]]]]]]
+      ]]]]
+    end
+
+    it 'returns a message for the :age key with :key? failure with :rule set explicitly' do
+      expect(result[0].rule).to be(:user)
+      expect(result[0].path).to eql([:user, :age])
+      expect(result[0]).to eql('is missing')
+    end
+
+    it 'returns a message for the :email key with :key? failure with :rule set explicitly' do
+      expect(result[1].rule).to be(:user)
+      expect(result[1].path).to eql([:user, :email])
+      expect(result[1]).to eql('is missing')
+    end
+  end
 end

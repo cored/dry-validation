@@ -69,7 +69,8 @@ module Dry
       end
 
       def visit_set(node, opts = EMPTY_HASH)
-        node.map { |input| visit(input, opts) }
+        name, other = node
+        other.map { |failure| visit(failure, opts.merge(rule: name, path: [name])) }
       end
 
       def visit_implication(node, *args)
