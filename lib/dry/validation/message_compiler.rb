@@ -66,14 +66,13 @@ module Dry
         ]
       end
 
-      def visit_key(node, opts = EMPTY_OPTS)
-        name, predicate = node
-        visit(predicate, opts.with_rule(name, path: name))
+      def visit_path(node, opts = EMPTY_OPTS)
+        name, other = node
+        visit(other, opts.(path: name))
       end
 
       def visit_set(node, opts = EMPTY_OPTS)
-        name, other = node
-        other.map { |failure| visit(failure, opts.with_rule(name, path: name)) }
+        node.map { |el| visit(el, opts) }
       end
 
       def visit_implication(node, *args)

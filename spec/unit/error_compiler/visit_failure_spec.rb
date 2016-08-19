@@ -3,9 +3,9 @@ RSpec.describe Dry::Validation::ErrorCompiler, '#visit_failure' do
 
   let(:visitor) { :visit_failure }
 
-  context 'with an anonymous with key-rule failure and :int? predicate' do
+  context 'with :int? predicate' do
     let(:node) do
-      [nil, [:key, [:age, [:predicate, [:int?, [[:input, '17']]]]]]]
+      [:age, [:path, [:age, [:predicate, [:int?, [[:input, '17']]]]]]]
     end
 
     it 'returns a message for :int? failure with :rule name inferred from key-rule' do
@@ -15,24 +15,12 @@ RSpec.describe Dry::Validation::ErrorCompiler, '#visit_failure' do
     end
   end
 
-  context 'with an named failure with key-rule failure and :int? predicate' do
-    let(:node) do
-      [:age_check, [:key, [:age, [:predicate, [:int?, [[:input, '17']]]]]]]
-    end
-
-    it 'returns a message for :int? failure with :rule set explicitly' do
-      expect(result.rule).to be(:age_check)
-      expect(result.path).to eql([:age])
-      expect(result).to eql('must be an integer')
-    end
-  end
-
   context 'with each-rule failure and :int? predicate' do
     let(:node) do
-      [nil, [:each, [:items, [
-        [:failure, [0, [:predicate, [:int?, [[:input, 'foo']]]]]],
-        [:failure, [2, [:predicate, [:int?, [[:input, 'bar']]]]]]
-      ]]]]
+      [:items, [:path, [:items, [:each, [
+        [:path, [0, [:predicate, [:int?, [[:input, 'foo']]]]]],
+        [:path, [2, [:predicate, [:int?, [[:input, 'bar']]]]]]
+      ]]]]]
     end
 
     it 'returns a message for the first element that failed' do
@@ -50,10 +38,10 @@ RSpec.describe Dry::Validation::ErrorCompiler, '#visit_failure' do
 
   context 'with a named set-rule failure and :key? predicate' do
     let(:node) do
-      [nil, [:set, [:user, [
-        [:failure, [:age, [:predicate, [:key?, [[:name, :age], [:input, {}]]]]]],
-        [:failure, [:email, [:predicate, [:key?, [[:name, :email], [:input, {}]]]]]]
-      ]]]]
+      [:user, [:path, [:user, [:set, [
+        [:path, [:age, [:predicate, [:key?, [[:name, :age], [:input, {}]]]]]],
+        [:path, [:email, [:predicate, [:key?, [[:name, :email], [:input, {}]]]]]]
+      ]]]]]
     end
 
     it 'returns a message for the :age key with :key? failure with :rule set explicitly' do
