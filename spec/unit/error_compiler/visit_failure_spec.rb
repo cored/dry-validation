@@ -39,20 +39,20 @@ RSpec.describe Dry::Validation::ErrorCompiler, '#visit_failure' do
   context 'with a named set-rule failure and :key? predicate' do
     let(:node) do
       [:user, [:path, [:user, [:set, [
-        [:path, [:age, [:predicate, [:key?, [[:name, :age], [:input, {}]]]]]],
-        [:path, [:email, [:predicate, [:key?, [[:name, :email], [:input, {}]]]]]]
+        [:predicate, [:key?, [[:name, :age], [:input, {}]]]],
+        [:predicate, [:key?, [[:name, :email], [:input, {}]]]]
       ]]]]]
     end
 
     it 'returns a message for the :age key with :key? failure with :rule set explicitly' do
       expect(result[0].rule).to be(:user)
-      expect(result[0].path).to eql([:user, :age])
+      expect(result[0].path).to eql([:user])
       expect(result[0]).to eql('is missing')
     end
 
     it 'returns a message for the :email key with :key? failure with :rule set explicitly' do
       expect(result[1].rule).to be(:user)
-      expect(result[1].path).to eql([:user, :email])
+      expect(result[1].path).to eql([:user])
       expect(result[1]).to eql('is missing')
     end
   end
