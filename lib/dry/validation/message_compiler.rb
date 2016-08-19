@@ -68,10 +68,6 @@ module Dry
         visit(predicate, { rule: name, path: [name] }.merge(opts))
       end
 
-      def visit_val(node, opts = EMPTY_HASH)
-        visit(node, opts)
-      end
-
       def visit_set(node, opts = EMPTY_HASH)
         node.map { |input| visit(input, opts) }
       end

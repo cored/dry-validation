@@ -30,8 +30,8 @@ RSpec.describe Dry::Validation::ErrorCompiler, '#visit_failure' do
   context 'with each-rule failure and :int? predicate' do
     let(:node) do
       [nil, [:each, [:items, [
-        [:failure, [0, [:val, [:predicate, [:int?, [[:input, 'foo']]]]]]],
-        [:failure, [2, [:val, [:predicate, [:int?, [[:input, 'bar']]]]]]]
+        [:failure, [0, [:predicate, [:int?, [[:input, 'foo']]]]]],
+        [:failure, [2, [:predicate, [:int?, [[:input, 'bar']]]]]]
       ]]]]
     end
 
