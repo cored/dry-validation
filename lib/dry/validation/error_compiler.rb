@@ -11,24 +11,24 @@ module Dry
         Message
       end
 
-      def visit_failure(node, opts = EMPTY_HASH)
+      def visit_failure(node, opts = EMPTY_OPTS)
         name, other = node
 
-        if name && opts[:path]
-          visit(other, opts.merge(path: [*opts[:path], *name]))
+        if name && opts.path?
+          visit(other, opts.(path: name))
         elsif name
-          visit(other, opts.merge(rule: name))
+          visit(other, opts.(rule: name))
         else
           visit(other, opts)
         end
       end
 
-      def visit_each(node, opts = EMPTY_HASH)
+      def visit_each(node, opts = EMPTY_OPTS)
         path, items = node
-        items.map { |el| visit(el, opts.merge(rule: path, path: path, each: true)) }
+        items.map { |el| visit(el, opts.(rule: path, path: path, each: true)) }
       end
 
-      def visit_check(node, opts = EMPTY_HASH)
+      def visit_check(node, opts = EMPTY_OPTS)
         name, other = node
 
         if opts[:schema]

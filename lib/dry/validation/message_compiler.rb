@@ -1,11 +1,14 @@
 require 'dry/validation/constants'
 require 'dry/validation/message'
 require 'dry/validation/message_set'
+require 'dry/validation/message_compiler/visitor_opts'
 
 module Dry
   module Validation
     class MessageCompiler
       attr_reader :messages, :options, :locale, :default_lookup_options
+
+      EMPTY_OPTS = VisitorOpts.new
 
       def initialize(messages, options = {})
         @messages = messages
@@ -32,7 +35,7 @@ module Dry
         __send__(:"visit_#{node[0]}", node[1], *args)
       end
 
-      def visit_predicate(node, base_opts = EMPTY_HASH)
+      def visit_predicate(node, base_opts = EMPTY_OPTS)
         predicate, args = node
 
         *arg_vals, _ = args.map(&:last)
@@ -63,14 +66,14 @@ module Dry
         ]
       end
 
-      def visit_key(node, opts = EMPTY_HASH)
+      def visit_key(node, opts = EMPTY_OPTS)
         name, predicate = node
-        visit(predicate, { rule: name, path: [name] }.merge(opts))
+        visit(predicate, opts.with_rule(name, path: name))
       end
 
-      def visit_set(node, opts = EMPTY_HASH)
+      def visit_set(node, opts = EMPTY_OPTS)
         name, other = node
-        other.map { |failure| visit(failure, opts.merge(rule: name, path: [name])) }
+        other.map { |failure| visit(failure, opts.with_rule(name, path: name)) }
       end
 
       def visit_implication(node, *args)
