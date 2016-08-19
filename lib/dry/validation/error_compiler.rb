@@ -28,56 +28,6 @@ module Dry
         items.map { |el| visit(el, opts.merge(rule: path, path: path, each: true)) }
       end
 
-      ## <OLD STUFF>
-
-      def visit_error(node, opts = EMPTY_HASH)
-        rule, error = node
-        node_path = Array(opts.fetch(:path, rule))
-
-        path = if rule.is_a?(Array) && rule.size > node_path.size
-                 rule
-               else
-                 node_path
-               end
-
-        path.compact!
-
-        template = messages[rule.is_a?(Array) ? rule.last : rule, default_lookup_options]
-
-        if template
-          predicate, args, tokens = visit(error, opts.merge(path: path, message: false))
-          message_class[predicate, path, template % tokens, rule: rule, args: args]
-        else
-          visit(error, opts.merge(rule: rule, path: path))
-        end
-      end
-
-      def visit_input(node, opts = EMPTY_HASH)
-        rule, result = node
-        opt_rule = opts[:rule]
-
-        if opts[:each] && opt_rule.is_a?(Array)
-          visit(result, opts.merge(rule: rule, path: opts[:path] + [opt_rule.last]))
-        else
-          visit(result, opts.merge(rule: rule))
-        end
-      end
-
-      def visit_result(node, opts = EMPTY_HASH)
-        input, other = node
-        visit(other, opts.merge(input: input))
-      end
-
-      def visit_schema(node, opts = EMPTY_HASH)
-        path, other = node
-
-        if opts[:path]
-          visit(other, opts.merge(path: opts[:path] + [path.last]))
-        else
-          visit(other, opts.merge(path: [path], schema: true))
-        end
-      end
-
       def visit_check(node, opts = EMPTY_HASH)
         name, other = node
 
