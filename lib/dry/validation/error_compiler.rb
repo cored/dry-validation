@@ -28,16 +28,6 @@ module Dry
         items.map { |el| visit(el, opts.(rule: path, path: path, each: true)) }
       end
 
-      def visit_check(node, opts = EMPTY_OPTS)
-        name, other = node
-
-        if opts[:schema]
-          visit(other, opts)
-        else
-          visit(other, opts.merge(path: Array(name)))
-        end
-      end
-
       def lookup_options(opts, arg_vals = [])
         super.update(val_type: opts[:input].class)
       end
