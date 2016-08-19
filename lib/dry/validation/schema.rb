@@ -58,7 +58,7 @@ module Dry
         initialize_rules(rules)
         initialize_checks(options.fetch(:checks, []))
 
-        @executor = Executor.new(config.path) do |steps|
+        @executor = Executor.new do |steps|
           steps << ProcessInput.new(input_processor) if input_processor
           steps << ApplyInputRule.new(input_rule) if input_rule
           steps << ApplyRules.new(@rules)
@@ -74,7 +74,7 @@ module Dry
 
       def call(input)
         output, result = executor.(input)
-        Result.new(output, result, error_compiler, hint_compiler)
+        Result.new(output, result, error_compiler, hint_compiler, config.path)
       end
 
       def curry(*curry_args)
