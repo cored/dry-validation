@@ -62,7 +62,7 @@ module Dry
 
         message_class[
           predicate, path, text,
-          args: arg_vals, rule: rule, each: base_opts[:each] == true
+          args: arg_vals, rule: rule, each: base_opts[:each]
         ]
       end
 
