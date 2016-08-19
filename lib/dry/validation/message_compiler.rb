@@ -46,8 +46,8 @@ module Dry
         options = base_opts.update(lookup_options(base_opts, arg_vals))
         msg_opts = options.update(tokens)
 
-        name = msg_opts[:name]
-        rule = msg_opts[:rule] || name
+        rule = msg_opts[:rule]
+        path = msg_opts[:path]
 
         template = messages[predicate, msg_opts]
 
@@ -56,7 +56,6 @@ module Dry
         end
 
         text = message_text(rule, template, tokens, options)
-        path = message_path(msg_opts, name)
 
         message_class[
           predicate, path, text,
@@ -66,7 +65,7 @@ module Dry
 
       def visit_key(node, opts = EMPTY_HASH)
         name, predicate = node
-        visit(predicate, opts.merge(name: name))
+        visit(predicate, { rule: name, path: [name] }.merge(opts))
       end
 
       def visit_val(node, opts = EMPTY_HASH)
@@ -75,11 +74,6 @@ module Dry
 
       def visit_set(node, opts = EMPTY_HASH)
         node.map { |input| visit(input, opts) }
-      end
-
-      def visit_el(node, opts = EMPTY_HASH)
-        idx, el = node
-        visit(el, opts.merge(path: opts[:path] + [idx]))
       end
 
       def visit_implication(node, *args)
@@ -106,20 +100,6 @@ module Dry
           "#{rule_name} #{text}"
         else
           text
-        end
-      end
-
-      def message_path(opts, name)
-        if name.is_a?(Array)
-          name
-        else
-          path = opts[:path] || Array(name)
-
-          if name && path.last != name
-            path += [name]
-          end
-
-          path
         end
       end
 

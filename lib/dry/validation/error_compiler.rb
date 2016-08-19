@@ -11,14 +11,21 @@ module Dry
         Message
       end
 
-      def visit_failure(node)
+      def visit_failure(node, opts = EMPTY_HASH)
         name, other = node
 
-        if name
-          visit(other, rule: name)
+        if name && opts[:path]
+          visit(other, opts.merge(path: [opts[:path], *name]))
+        elsif name
+          visit(other, opts.merge(rule: name))
         else
-          visit(other)
+          visit(other, opts)
         end
+      end
+
+      def visit_each(node, opts = EMPTY_HASH)
+        path, items = node
+        items.map { |el| visit(el, opts.merge(rule: path, path: path, each: true)) }
       end
 
       ## <OLD STUFF>
@@ -59,10 +66,6 @@ module Dry
       def visit_result(node, opts = EMPTY_HASH)
         input, other = node
         visit(other, opts.merge(input: input))
-      end
-
-      def visit_each(node, opts = EMPTY_HASH)
-        node.map { |el| visit(el, opts.merge(each: true)) }
       end
 
       def visit_schema(node, opts = EMPTY_HASH)
