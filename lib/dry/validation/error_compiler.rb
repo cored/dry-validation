@@ -11,6 +11,18 @@ module Dry
         Message
       end
 
+      def visit_failure(node)
+        name, other = node
+
+        if name
+          visit(other, rule: name)
+        else
+          visit(other)
+        end
+      end
+
+      ## <OLD STUFF>
+
       def visit_error(node, opts = EMPTY_HASH)
         rule, error = node
         node_path = Array(opts.fetch(:path, rule))
