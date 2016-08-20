@@ -37,6 +37,13 @@ module Dry
         @schema = predicates.schema
       end
 
+      def visit_rule(node)
+        other, options = node
+        rule = visit(other)
+        rule.name!(options.fetch(:name)) if rule.options && rule.name.nil?
+        rule
+      end
+
       def visit_predicate(node)
         super.evaluate_args!(schema)
       end

@@ -46,12 +46,20 @@ module Dry
 
       def message_set(options = EMPTY_HASH)
         error_compiler
-          .with(options).(to_ast)
+          .with(options).(error_ast)
           .with_hints!(hint_compiler.with(options).())
       end
 
-      def to_ast
-        [type, [:path, path, [:set, error_ast]]]
+      def to_ast(*)
+        if path.size > 0
+          [type, [name, [:path, [name, [:set, error_ast]]]]]
+        else
+          [:set, error_ast]
+        end
+      end
+
+      def name
+        Array(path).last
       end
 
       private

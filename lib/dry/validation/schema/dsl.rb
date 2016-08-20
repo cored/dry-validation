@@ -104,7 +104,7 @@ module Dry
           end
         end
 
-        def create_rule(node)
+        def create_rule(node, name = self.name)
           Schema::Rule.new(node, name: name, target: self)
         end
       end

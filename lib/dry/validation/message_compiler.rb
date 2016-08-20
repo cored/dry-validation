@@ -38,18 +38,19 @@ module Dry
       def visit_predicate(node, base_opts = EMPTY_OPTS)
         predicate, args = node
 
-        *arg_vals, _ = args.map(&:last)
-
+        *arg_vals, val = args.map(&:last)
         tokens = message_tokens(args)
+
+        input = val != Logic::Predicate::Undefined ? val : nil
 
         if base_opts[:message] == false
           return [predicate, arg_vals, tokens]
         end
 
-        options = base_opts.update(lookup_options(base_opts, arg_vals))
+        options = base_opts.update(lookup_options(arg_vals: arg_vals, input: input))
         msg_opts = options.update(tokens)
 
-        rule = msg_opts[:rule]
+        rule = msg_opts[:rule] || options[:name]
         path = msg_opts[:path]
 
         template = messages[predicate, msg_opts]
@@ -62,7 +63,7 @@ module Dry
 
         message_class[
           predicate, path, text,
-          args: arg_vals, rule: rule, each: base_opts[:each]
+          args: arg_vals, input: input, rule: rule, each: base_opts[:each]
         ]
       end
 
@@ -85,7 +86,7 @@ module Dry
         visit(right, *args)
       end
 
-      def lookup_options(_opts, arg_vals = [])
+      def lookup_options(arg_vals: [], input: nil)
         default_lookup_options.merge(
           arg_type: arg_vals.size == 1 && arg_vals[0].class
         )

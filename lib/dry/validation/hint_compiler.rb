@@ -50,14 +50,30 @@ module Dry
         cache.fetch_or_store(hash) { super(rules) }
       end
 
-      def visit_predicate(node, opts = EMPTY_HASH)
+      def visit_predicate(node, opts = EMPTY_OPTS)
         predicate, args = node
         return EMPTY_ARRAY if excluded.include?(predicate) || dyn_args?(args)
-        super(node, opts.merge(val_type: TYPES[predicate]))
+        msg = super(node, opts.merge(val_type: TYPES[predicate]))
+        msg.path.uniq! # FIXME: this shouldn't be needed
+        msg
       end
 
-      def visit_each(node, opts = EMPTY_HASH)
-        visit(node, opts.merge(each: true))
+      def visit_rule(node, opts = EMPTY_OPTS)
+        other, options = node
+        visit(other, opts.(path: options[:name]))
+      end
+
+      def visit_val(node, opts = EMPTY_OPTS)
+        visit(node, opts)
+      end
+
+      def visit_key(node, opts = EMPTY_OPTS)
+        name, other = node
+        visit(other, opts.(rule: name))
+      end
+
+      def visit_each(node, opts = EMPTY_OPTS)
+        visit(node, opts.(each: true))
       end
 
       def visit_or(node, *args)
@@ -70,10 +86,10 @@ module Dry
         visit(right, *args)
       end
 
-      def visit_schema(node, opts = EMPTY_HASH)
+      def visit_schema(node, opts = EMPTY_OPTS)
         path = node.config.path
         rules = node.rule_ast
-        schema_opts = opts.merge(path: [path])
+        schema_opts = opts.(path: path)
 
         rules.map { |rule| visit(rule, schema_opts) }
       end

@@ -20,8 +20,8 @@ module Dry
         node.map { |el| visit(el, opts.(each: true)) }
       end
 
-      def lookup_options(opts, arg_vals = [])
-        super.update(val_type: opts[:input].class)
+      def lookup_options(arg_vals: [], input:)
+        super.update(val_type: input.class)
       end
     end
   end
